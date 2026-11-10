@@ -1,1 +1,184 @@
-Hallo
+
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#b68b55">
+  <title>Mio-Knopf</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: #f4f0e9;
+      color: #44413e;
+      font-family: system-ui, sans-serif;
+      padding: 24px 18px;
+    }
+    main { max-width: 480px; margin: auto; }
+    h1 { color: #946b39; margin-bottom: 4px; }
+    .sub { color: #77716b; margin-bottom: 28px; }
+    section {
+      background: #fffdf9;
+      padding: 20px;
+      margin: 18px 0;
+      border-radius: 18px;
+    }
+    h2 { margin-top: 0; font-size: 20px; }
+    label {
+      display: block;
+      margin: 17px 0;
+      line-height: 1.5;
+    }
+    input[type="checkbox"] {
+      width: 21px;
+      height: 21px;
+      accent-color: #a77b43;
+      vertical-align: middle;
+      margin-right: 8px;
+    }
+    textarea {
+      width: 100%;
+      min-height: 75px;
+      border: 1px solid #c8c0b6;
+      border-radius: 10px;
+      padding: 12px;
+      font: inherit;
+    }
+    button {
+      background: #b68b55;
+      color: white;
+      border: none;
+      border-radius: 14px;
+      padding: 15px 20px;
+      font: inherit;
+      font-weight: 600;
+      width: 100%;
+      cursor: pointer;
+    }
+    #spruch {
+      text-align: center;
+      min-height: 48px;
+      margin-top: 16px;
+      font-weight: 500;
+    }
+    small { color: #77716b; }
+  </style>
+</head>
+<body>
+<main>
+  <h1>Mio-Knopf ☕</h1>
+  <p class="sub">Kleine Gewohnheiten. Kein Leistungssport.</p>
+
+  <section>
+    <h2>☀️ Morgens</h2>
+    <label><input type="checkbox" id="kaffee">
+      Kaffee genossen</label>
+    <label><input type="checkbox" id="wasser">
+      Ein Glas Wasser getrunken</label>
+    <label><input type="checkbox" id="fruehstueck">
+      Frühstück ausgelassen</label>
+  </section>
+
+  <section>
+    <h2>🌙 Abends</h2>
+    <label><input type="checkbox" id="abendwasser">
+      Großes Glas Wasser nach dem Essen</label>
+    <label><input type="checkbox" id="snacken">
+      Danach weniger Lust auf Snacks gehabt</label>
+  </section>
+
+  <section>
+    <h2>📝 Kleine Beobachtung</h2>
+    <textarea id="notiz"
+      placeholder="Was war heute bemerkenswert?"></textarea>
+  </section>
+
+  <section>
+    <button id="mio">Mio, sag was.</button>
+    <p id="spruch"></p>
+  </section>
+
+  <p><small>Deine Einträge bleiben in diesem Browser auf
+  diesem Gerät. Keine Anmeldung, keine Cloud,
+  keine Kalorienpolizei.</small></p>
+</main>
+
+<script>
+  const felder = [
+    "kaffee", "wasser", "fruehstueck",
+    "abendwasser", "snacken", "notiz"
+  ];
+
+  const heute = () => {
+    const d = new Date();
+    return d.getFullYear() + "-" +
+      String(d.getMonth() + 1).padStart(2, "0") + "-" +
+      String(d.getDate()).padStart(2, "0");
+  };
+
+  let tag = heute();
+  const schluessel = () => "mio-knopf-" + tag;
+
+  function laden() {
+    const daten = JSON.parse(
+      localStorage.getItem(schluessel()) || "{}"
+    );
+    felder.forEach(id => {
+      const feld = document.getElementById(id);
+      if (feld.type === "checkbox") {
+        feld.checked = !!daten[id];
+      } else {
+        feld.value = daten[id] || "";
+      }
+    });
+  }
+
+  function speichern() {
+    const daten = {};
+    felder.forEach(id => {
+      const feld = document.getElementById(id);
+      daten[id] = feld.type === "checkbox"
+        ? feld.checked : feld.value;
+    });
+    localStorage.setItem(schluessel(),
+      JSON.stringify(daten));
+  }
+
+  felder.forEach(id => {
+    document.getElementById(id)
+      .addEventListener("input", speichern);
+  });
+
+  const sprueche = [
+    "Ein Glas Wasser. Die Revolution bleibt überschaubar.",
+    "Du musst heute niemandem etwas beweisen.",
+    "Kaffee ist auch eine Form von Tagesplanung.",
+    "Beobachten reicht. Wir eröffnen keine Kontrollbehörde.",
+    "Nicht perfekt? Hervorragend menschlich.",
+    "Morgen ist auch noch ein Tag. Leider mit Wecker."
+  ];
+
+  document.getElementById("mio")
+    .addEventListener("click", () => {
+      const zufall = Math.floor(
+        Math.random() * sprueche.length
+      );
+      document.getElementById("spruch")
+        .textContent = sprueche[zufall];
+    });
+
+  laden();
+
+  document.addEventListener("visibilitychange", () => {
+    if (!document.hidden && heute() !== tag) {
+      tag = heute();
+      laden();
+      document.getElementById("spruch")
+        .textContent = "";
+    }
+  });
+</script>
+</body>
+</html>
+
